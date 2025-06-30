@@ -1,0 +1,188 @@
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# Map of Windows Editions to their Generic KMS Keys
+$KMSKeys = @{
+    "Windows 10 Home"        = "TX9XD-98N7V-6WMQ6-BX7FG-H8Q99"
+    "Windows 10 Pro"         = "W269N-WFGWX-YVC9B-4J6C9-T83GX"
+    "Windows 10 Education"   = "NW6C2-QMPVW-D7KKK-3GKT6-VCFB2"
+    "Windows 10 Enterprise"  = "NPPR9-FWDCX-D2C8J-H872K-2YT43"
+    "Windows 10 Pro Workstation" = "NRG8B-VKK3Q-CXVCJ-9G2XF-6Q84J"
+    "Windows 10 LTSC 2021"   = "M7XTQ-FN8P6-TTKYV-9D4CC-J462D"
+    "Windows 11 Pro"         = "W269N-WFGWX-YVC9B-4J6C9-T83GX"
+    "Windows 11 Home"        = "TX9XD-98N7V-6WMQ6-BX7FG-H8Q99"
+    "Windows 11 Education"   = "NW6C2-QMPVW-D7KKK-3GKT6-VCFB2"
+    "Windows 11 Enterprise"  = "NPPR9-FWDCX-D2C8J-H872K-2YT43"
+    "Windows Server 2019 Datacenter" = "WMDGN-G9PQG-XVVXX-R3X43-63DFG"
+    "Windows Server 2022 Standard"   = "VDYBN-27WPP-V4HQT-9VMD4-VMK7H"
+}
+
+function Get-SystemInfo {
+    $info = @{}
+    try {
+        $ver = Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+        $info["Edition"]        = $ver.EditionID
+        $info["ProductName"]    = $ver.ProductName
+        $info["Build"]          = $ver.CurrentBuild
+        $info["ReleaseId"]      = $ver.ReleaseId
+        $info["DisplayVersion"] = $ver.DisplayVersion
+    } catch {
+        $info["Error"] = "Could not read system version info."
+    }
+
+    try {
+        $status = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object { $_.PartialProductKey -and $_.LicenseStatus -eq 1 })[0]
+        $info["Activation"] = if ($status) { "Activated" } else { "Not Activated" }
+    } catch {
+        $info["Activation"] = "Unknown"
+    }
+
+    return $info
+}
+
+function Refresh-SystemInfo {
+    $sys = Get-SystemInfo
+    $infoBox.Clear()
+   foreach ($key in $sys.Keys) {
+    $value = if ($sys[$key]) { $sys[$key] } else { "N/A" }
+    $infoBox.AppendText($key.ToString().PadRight(20) + ": " + $value.ToString() + "`r`n")
+}
+}
+
+
+
+# Create form
+$form = New-Object Windows.Forms.Form
+$form.Text = "Windows KMS Toolkit"
+$form.Size = New-Object Drawing.Size(700, 650)
+$form.StartPosition = "CenterScreen"
+$form.BackColor = 'WhiteSmoke'
+$form.FormBorderStyle = "FixedDialog"
+$form.MaximizeBox = $false
+$form.TopMost = $true
+
+# Header label
+$header = New-Object Windows.Forms.Label
+$header.Text = "🔧 Windows Activation & Upgrade Toolkit"
+$header.Font = "Segoe UI,12,style=Bold"
+$header.ForeColor = "DarkBlue"
+$header.AutoSize = $true
+$header.Location = New-Object Drawing.Point(20, 15)
+$form.Controls.Add($header)
+
+# Info box
+$infoBox = New-Object Windows.Forms.TextBox
+$infoBox.Location = New-Object Drawing.Point(20, 50)
+$infoBox.Size = New-Object Drawing.Size(640, 120)
+$infoBox.Multiline = $true
+$infoBox.ReadOnly = $true
+$infoBox.ScrollBars = "Vertical"
+$infoBox.Font = "Consolas,9"
+$form.Controls.Add($infoBox)
+
+# Output box
+$outputBox = New-Object Windows.Forms.TextBox
+$outputBox.Location = New-Object Drawing.Point(20, 340)
+$outputBox.Size = New-Object Drawing.Size(640, 150)
+$outputBox.Multiline = $true
+$outputBox.ReadOnly = $true
+$outputBox.ScrollBars = "Vertical"
+$outputBox.Font = "Consolas,9"
+$form.Controls.Add($outputBox)
+
+# Upgrade to Pro button
+$btnUpgrade = New-Object Windows.Forms.Button
+$btnUpgrade.Text = "🡅 Upgrade to Pro"
+$btnUpgrade.Location = New-Object Drawing.Point(20, 180)
+$btnUpgrade.Size = New-Object Drawing.Size(200, 35)
+$btnUpgrade.BackColor = 'DarkGreen'
+$btnUpgrade.ForeColor = 'White'
+$btnUpgrade.Font = "Segoe UI,9,style=Bold"
+$btnUpgrade.Add_Click({
+    $confirm = [Windows.Forms.MessageBox]::Show("Proceed with upgrading this machine to Windows 10 Pro? This may restart the machine.","Confirm Upgrade","YesNo","Warning")
+    if ($confirm -eq "Yes") {
+        $outputBox.AppendText("Applying Windows 10 Pro generic key...`r`n")
+        Start-Process "changepk.exe" -ArgumentList "/ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T" -Wait
+        $outputBox.AppendText("Upgrade triggered. Windows will upgrade and may prompt for a restart.`r`n")
+    }
+})
+$form.Controls.Add($btnUpgrade)
+
+# KMS Activation Button
+$btnActivate = New-Object Windows.Forms.Button
+$btnActivate.Text = "☑️ Activate via KMS"
+$btnActivate.Location = New-Object Drawing.Point(240, 180)
+$btnActivate.Size = New-Object Drawing.Size(200, 35)
+$btnActivate.BackColor = 'SteelBlue'
+$btnActivate.ForeColor = 'White'
+$btnActivate.Font = "Segoe UI,9,style=Bold"
+$btnActivate.Add_Click({
+    $kmsServer = [Windows.Forms.Interaction]::InputBox("Enter your KMS server (hostname or IP):", "KMS Server")
+    if ($kmsServer -ne "") {
+        $outputBox.AppendText("Setting KMS server: $kmsServer`r`n")
+        Start-Process "slmgr.vbs" -ArgumentList "/skms $kmsServer" -Wait -WindowStyle Hidden
+        $outputBox.AppendText("Activating...`r`n")
+        Start-Process "slmgr.vbs" -ArgumentList "/ato" -Wait -WindowStyle Hidden
+        $outputBox.AppendText("Activation attempted. Use 'slmgr /xpr' to verify.`r`n")
+        Refresh-SystemInfo
+    }
+})
+$form.Controls.Add($btnActivate)
+
+# Dropdown to install generic key
+$labelKey = New-Object Windows.Forms.Label
+$labelKey.Text = "Install Generic KMS Key:"
+$labelKey.Location = New-Object Drawing.Point(20, 230)
+$labelKey.Size = New-Object Drawing.Size(200, 20)
+$form.Controls.Add($labelKey)
+
+$comboBox = New-Object Windows.Forms.ComboBox
+$comboBox.Location = New-Object Drawing.Point(20, 250)
+$comboBox.Size = New-Object Drawing.Size(400, 30)
+$comboBox.Font = "Segoe UI,9"
+$KMSKeys.Keys | Sort-Object | ForEach-Object { $comboBox.Items.Add($_) }
+$comboBox.SelectedIndex = 1
+$form.Controls.Add($comboBox)
+
+$btnInstallKey = New-Object Windows.Forms.Button
+$btnInstallKey.Text = "🔑 Install Key"
+$btnInstallKey.Location = New-Object Drawing.Point(440, 248)
+$btnInstallKey.Size = New-Object Drawing.Size(100, 30)
+$btnInstallKey.BackColor = 'DarkSlateGray'
+$btnInstallKey.ForeColor = 'White'
+$btnInstallKey.Add_Click({
+    $selectedEdition = $comboBox.SelectedItem
+    if ($selectedEdition -and $KMSKeys.ContainsKey($selectedEdition)) {
+        $key = $KMSKeys[$selectedEdition]
+        $outputBox.AppendText("Installing key for: $selectedEdition`r`n")
+        Start-Process "slmgr.vbs" -ArgumentList "/ipk $key" -Wait -WindowStyle Hidden
+        $outputBox.AppendText("Key installed: $key`r`n")
+    } else {
+        $outputBox.AppendText("No key found or invalid selection.`r`n")
+    }
+})
+$form.Controls.Add($btnInstallKey)
+
+# Refresh Info
+$btnRefresh = New-Object Windows.Forms.Button
+$btnRefresh.Text = "🔄 Refresh Info"
+$btnRefresh.Location = New-Object Drawing.Point(560, 50)
+$btnRefresh.Size = New-Object Drawing.Size(100, 30)
+$btnRefresh.Add_Click({ Refresh-SystemInfo })
+$form.Controls.Add($btnRefresh)
+
+# Close button
+$btnClose = New-Object Windows.Forms.Button
+$btnClose.Text = "Close"
+$btnClose.Location = New-Object Drawing.Point(560, 520)
+$btnClose.Size = New-Object Drawing.Size(100, 30)
+$btnClose.BackColor = 'Firebrick'
+$btnClose.ForeColor = 'White'
+$btnClose.Add_Click({ $form.Close() })
+$form.Controls.Add($btnClose)
+
+# Initial Info
+Refresh-SystemInfo
+
+# Show form
+[void]$form.ShowDialog()
