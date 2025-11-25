@@ -64,7 +64,7 @@ $form.TopMost = $true
 # Header label
 $header = New-Object Windows.Forms.Label
 $header.Text = "🔧 Windows Activation & Upgrade Toolkit"
-$header.Font = "Segoe UI,12,style=Bold"
+$header.Font = New-Object System.Drawing.Font("Segoe UI Emoji",10)  # Use emoji-capable font
 $header.ForeColor = "DarkBlue"
 $header.AutoSize = $true
 $header.Location = New-Object Drawing.Point(20, 15)
@@ -92,12 +92,12 @@ $form.Controls.Add($outputBox)
 
 # Upgrade to Pro button
 $btnUpgrade = New-Object Windows.Forms.Button
-$btnUpgrade.Text = "🡅 Upgrade to Pro"
+$btnUpgrade.Text = "⬆ Upgrade to Pro"
 $btnUpgrade.Location = New-Object Drawing.Point(20, 180)
 $btnUpgrade.Size = New-Object Drawing.Size(200, 35)
 $btnUpgrade.BackColor = 'DarkGreen'
 $btnUpgrade.ForeColor = 'White'
-$btnUpgrade.Font = "Segoe UI,9,style=Bold"
+$btnUpgrade.Font = New-Object System.Drawing.Font("Segoe UI Emoji",10)  # Use emoji-capable font
 $btnUpgrade.Add_Click({
     $confirm = [Windows.Forms.MessageBox]::Show("Proceed with upgrading this machine to Windows 10 Pro? This may restart the machine.","Confirm Upgrade","YesNo","Warning")
     if ($confirm -eq "Yes") {
@@ -115,7 +115,7 @@ $btnActivate.Location = New-Object Drawing.Point(240, 180)
 $btnActivate.Size = New-Object Drawing.Size(200, 35)
 $btnActivate.BackColor = 'SteelBlue'
 $btnActivate.ForeColor = 'White'
-$btnActivate.Font = "Segoe UI,9,style=Bold"
+$btnActivate.Font = New-Object System.Drawing.Font("Segoe UI Emoji",10)  # Use emoji-capable font
 $btnActivate.Add_Click({
     $kmsServer = [Windows.Forms.Interaction]::InputBox("Enter your KMS server (hostname or IP):", "KMS Server")
     if ($kmsServer -ne "") {
@@ -150,6 +150,7 @@ $btnInstallKey.Location = New-Object Drawing.Point(440, 248)
 $btnInstallKey.Size = New-Object Drawing.Size(100, 30)
 $btnInstallKey.BackColor = 'DarkSlateGray'
 $btnInstallKey.ForeColor = 'White'
+$btnInstallKey.Font = New-Object System.Drawing.Font("Segoe UI Emoji",10)  # Use emoji-capable font
 $btnInstallKey.Add_Click({
     $selectedEdition = $comboBox.SelectedItem
     if ($selectedEdition -and $KMSKeys.ContainsKey($selectedEdition)) {
@@ -168,6 +169,7 @@ $btnRefresh = New-Object Windows.Forms.Button
 $btnRefresh.Text = "🔄 Refresh Info"
 $btnRefresh.Location = New-Object Drawing.Point(560, 50)
 $btnRefresh.Size = New-Object Drawing.Size(100, 30)
+$btnRefresh.Font = New-Object System.Drawing.Font("Segoe UI Emoji",10)  # Use emoji-capable font
 $btnRefresh.Add_Click({ Refresh-SystemInfo })
 $form.Controls.Add($btnRefresh)
 
