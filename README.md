@@ -1,15 +1,6 @@
 # WindowsUpgrade
 
 
-Open up Poweshell ISE as an administrator on your Computer.  Paste the Code and RUN with the green arrow at the top of the page.    
-
-<img width="458" height="216" alt="{B36AA77E-F713-4D02-8B93-D53CC33ADDE8}" src="https://github.com/user-attachments/assets/9c5593ec-1a78-49f9-989b-e66bdeaabc64" />
-
------FYI... THIS PROGRAM TAKES ABOUT 10 SECONDS TO LOAD-----
-
-<img width="821" height="399" alt="{C5A59E4D-AF56-4992-ACCB-3525B676659A}" src="https://github.com/user-attachments/assets/b2adfc37-31e2-4e7e-9ec1-8502bffd4bbc" />
-
-
 Powershell Gui to Upgrade your version of Windows from Home to Pro. 
 
 
@@ -24,3 +15,23 @@ Run and reboot.  It will convert your home license Pro upon reboot and add all t
 
 ![image](https://github.com/user-attachments/assets/1ed88bbc-7f2c-4eb0-a23b-9b4dcb96e03e)
 
+
+
+
+
+Open up Poweshell ISE as an administrator on your Computer.  
+
+<img width="821" height="399" alt="{C5A59E4D-AF56-4992-ACCB-3525B676659A}" src="https://github.com/user-attachments/assets/b2adfc37-31e2-4e7e-9ec1-8502bffd4bbc" />
+
+
+
+Paste the Code and RUN with the green arrow at the top of the page.    
+
+
+
+<img width="458" height="216" alt="{B36AA77E-F713-4D02-8B93-D53CC33ADDE8}" src="https://github.com/user-attachments/assets/9c5593ec-1a78-49f9-989b-e66bdeaabc64" />
+
+
+
+
+-----FYI... THIS PROGRAM TAKES ABOUT 10 SECONDS TO LOAD-----
