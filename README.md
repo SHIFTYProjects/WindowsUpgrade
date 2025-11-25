@@ -1,9 +1,11 @@
 # WindowsUpgrade
 
 
-Powershell Gui to Upgrade your version of Windows from Home to Pro.   
+Powershell Gui to Upgrade your version of Windows from Home to Pro. 
 
-This is just a placeholder license, and is not a hack.  You will still need a valid license key. 
+-----FYI... THIS PROGRAM TAKES ABOUT 10 SECONDS TO LOAD-----
+
+**This is just a placeholder license, and is not a hack.  You will still need a valid license key. **
 
 Usefull if you need to domain join a computer and it will function off your KMS key.
 
